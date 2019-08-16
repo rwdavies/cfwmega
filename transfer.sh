@@ -1,4 +1,4 @@
-## script to be run on WCHG for synchronize data between three locations
+## script to be run on WCHG for synchronize data between four locations
 
 ## make directory on /well
 mkdir /well/myers/rwdavies/chicago_oxford_2019_08_07
@@ -11,4 +11,10 @@ rsync --progress -av sparse:/Net/dense/data/outbredmice/imputation/ancestral_hap
 
 ## now transfer from /well to ucsc
 rsync -av --progress /well/myers/rwdavies/chicago_oxford_2019_08_07/* ucsc:/projects/ps-palmer/robbie/chicago_oxford_2019_08_07/
+
+## get truth data from smew
+mkdir /well/myers/rwdavies/cfw_truth
+rsync --progress -av smew:/data/smew1/rdavies/stitch_development/truth/cfw/megamuga_2018_05_18.tgz /well/myers/rwdavies/cfw_truth/
+tar -xzvf megamuga_2018_05_18.tgz
+
 
