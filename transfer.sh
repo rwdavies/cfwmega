@@ -7,7 +7,7 @@ mkdir /well/myers/rwdavies/chicago_oxford_2019_08_07
 rsync --progress -av sparse:/Net/dense/data/outbredmice/refs/mm10/mm10.dict /well/myers/rwdavies/chicago_oxford_2019_08_07/
 
 ## imputed data
-rsync --progress -av sparse:/Net/dense/data/outbredmice/imputation/ancestral_haps/chicago_oxford_2019_08_07/ /well/myers/rwdavies/chicago_oxford_2019_08_07/
+rsync --exclude=input --progress -av sparse:/Net/dense/data/outbredmice/imputation/ancestral_haps/chicago_oxford_2019_08_07/ /well/myers/rwdavies/chicago_oxford_2019_08_07/
 
 ## now transfer from /well to ucsc
 rsync -av --progress /well/myers/rwdavies/chicago_oxford_2019_08_07/* ucsc:/projects/ps-palmer/robbie/chicago_oxford_2019_08_07/
@@ -18,3 +18,9 @@ rsync --progress -av smew:/data/smew1/rdavies/stitch_development/truth/cfw/megam
 tar -xzvf megamuga_2018_05_18.tgz
 
 
+##
+## scratch
+## 
+
+## copy chromosome 19 input files
+## rsync --progress -av sparse:/Net/dense/data/outbredmice/imputation/ancestral_haps/chicago_oxford_2019_08_07/input/*chr19* /well/myers/rwdavies/chicago_oxford_2019_08_07/input/

@@ -1,10 +1,13 @@
 Folder with scripts for mega analysis of CFW
 
-## transfer.sh
+## 1 - impute.sh and impute.R
+use impute.sh to control running impute.R from the command line
+
+## 2 - transfer.sh
 script to transfer results from dense to well or ucsc
 
-## make_annot.R
+## 3 - make_annot.R
 script to make per-chromosome annotation files
 
-## calc_acc.R
+## 4 - calc_acc.R
 calculate accuracy using STITCH script. look at accuracy as a function of info, HWE, etc
