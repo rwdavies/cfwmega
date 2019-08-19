@@ -1,73 +1,28 @@
-## calculate accuracy of CFW oxford and chicago
-## stratify by QC metrics
-
+source("~/proj/cfwmega/calc_acc_functions.R")
 ##
 ## 1 - get data using existing script
-## 
+##
+library("parallel")
 chrlist <- paste0("chr", c(1:19, "X"))
-parallel::mclapply(chrlist, mc.cores = 8, function(chr) {
-    parallel::mclapply(c("oxford", "chicago"), mc.cores = 2, function(whose_samples) {
-        comparison_save_file <- paste0("/well/myers/rwdavies/chicago_oxford_2019_08_07/acc.data.", chr, ".", whose_samples, ".RData")
-        command <- paste0(
-            "cd ~/proj/STITCH && ./scripts/compare_vcf_to_truth.R ",
-            "--test-file=/well/myers/rwdavies/chicago_oxford_2019_08_07/stitch.", chr, ".vcf.gz ",
-            "--chr=", chr, " ",
-            "--compare-against=megamuga ",
-            "--verbose ",
-            "--whose-samples=", whose_samples, " ",
-            "--cfw-data-dir=/well/myers/rwdavies/cfw_truth/ ",
-            "--mega-save-file=/well/myers/rwdavies/chicago_oxford_2019_08_07/mega.", chr, ".", whose_samples, ".RData ",
-            "--comparison-save-file=", comparison_save_file
-        )
-        ##if (!file.exists(comparison_save_file)) {
-            system(command)
-        ##}
-    })
-})
+nCores <- 16
+outputdir <- "/well/myers/rwdavies/chicago_oxford_2019_08_07/"
+
+calculate_accuracy_for_vcfs(
+   chrlist = chrlist,
+   nCores = nCores,
+   outputdir = outputdir
+)
+
 
 quit()
 
-##
-## load data back in, perform bespoke comparisons
-##
-setwd("/well/myers/rwdavies/chicago_oxford_2019_08_07/")
-chrlist <- paste0("chr", c(1:19, "X"))
-all <- parallel::mclapply(chrlist, mc.cores = 8, function(chr) {
-    ## load oxford data
-    load(paste0("acc.data.", chr, ".oxford.RData"))
-    outO <- out
-    ## load chicago data
-    load(paste0("acc.data.", chr, ".chicago.RData"))
-    outC <- out
-    ## also load annot
-    annot <- data.table::fread(cmd = paste0("gunzip -c /well/myers/rwdavies/chicago_oxford_2019_08_07/annot.", chr, ".csv.gz"), data.table = FALSE)
-    rownames(annot) <- paste(annot[, 1], annot[, 2], annot[, 3], annot[, 4], sep = "-")
-    ## argh - intersect everything
-    o <- rownames(outO[["callsS"]])
-    c <- rownames(outC[["callsS"]])
-    both <- intersect(o, c)
-    r2.o <- outO[["r2"]][match(both, o)]
-    r2.c <- outC[["r2"]][match(both, c)]
-    annot <- annot[match(both, rownames(annot)), ]
-    if (nrow(annot) != length(r2.o)) {
-        stop(chr)
-    }
-    if (nrow(annot) != length(r2.c)) {
-        stop(chr)
-    }
-    return(
-        list(
-            r2.o = r2.o,
-            r2.c = r2.c,
-            annot = annot
-        )
-    )
-    ## callsO = outO[["callsS"]],
-    ## dosagesO = outO[["dosagesS"]],
-    ## callsC = outC[["callsS"]],
-    ## dosagesC = outC[["dosagesS"]],
-})
+all <- load_accuracy_results(
+   chrlist = chrlist,
+   nCores = nCores,
+   outputdir = outputdir
+)
 
+    
 ## callsO <- do.call("rbind", lapply(all, function(x) x[["callsO"]]))
 ## dosagesO <- do.call("rbind", lapply(all, function(x) x[["dosagesO"]]))
 ## callsC <- do.call("rbind", lapply(all, function(x) x[["callsC"]]))
@@ -88,21 +43,6 @@ min_hwe <- 1e-20
 annot[annot < min_hwe] <- min_hwe
 
 ## now - can make accuracy plots for different groups!
-
-get_specific_average <- function(info, r2, cutoffs) {
-    t(sapply(1:(length(cutoffs) - 1), function(i) {
-        s <- cutoffs[i]
-        e <- cutoffs[i + 1]        
-        w <- info >= s & info <= e
-        c(sum(w), mean(r2[w], na.rm = TRUE))
-    }))
-}
-
-get_cumulative_average <- function(info, r2, cutoffs) {
-    t(sapply(cutoffs, function(c) {
-        c(sum(info >= c), mean(r2[info >= c], na.rm = TRUE))
-    }))
-}
 
     
 

@@ -11,3 +11,6 @@ script to make per-chromosome annotation files
 
 ## 4 - calc_acc.R
 calculate accuracy using STITCH script. look at accuracy as a function of info, HWE, etc
+
+## other
+check_mega_uniqueness.R - assess whether uniqueness of reads is negatively impacting chicago samples. i.e. try picard markduplicates
